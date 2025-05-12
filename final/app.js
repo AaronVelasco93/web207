@@ -19,7 +19,6 @@ const db = mysql.createConnection({
     port: 3308
 });
 
-
 //validacion
 db.connect(err => {
     if(err){
@@ -36,3 +35,45 @@ app.listen(port,()=>{
     console.log(`http://127.0.0.1:${port}`);
 });
 
+//mostrar lista de usuarios
+app.get('/',(req,res)=>{
+    //consulta a la DB
+    const consultaDB= 'SELECT *  FROM users';
+
+    //trabajamos con la conexion
+    db.query(consultaDB,(err,results)=>{
+        if(err){
+            //no se encontro el usuario o se tiene un error
+            console.error('Error al recuperar Usuario',err);
+            //Mostraremos informacion al usuario
+            res.send('Error , no se recuperan los datos de la DB');
+        }else{
+
+            res.render('index',{ users: results});
+        }
+
+    });
+});
+
+//Modulo para agregar el usuario
+app.post('/add',(req,res)=>{
+    const {name, email}=req.body;
+    /*
+        Nombre : aaron
+        Correo: aaron@aragon.unam.mx
+        ->
+        name: aaron
+        email: aaron@aragon.unam.mx
+    */
+    const insertarRegistro= 'INSERT INTO users (name, email) VALUES (?,?)';
+    
+    db.query(insertarRegistro,[name,email],(err)=>{
+       if(err){
+        console.error('Erro al agregar usuario:',err);
+        res.send('Error')
+    } else{
+        res.redirect('/');
+
+       }
+    });
+});
