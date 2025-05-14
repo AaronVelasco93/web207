@@ -50,6 +50,7 @@ app.get('/',(req,res)=>{
         }else{
 
             res.render('index',{ users: results});
+           
         }
 
     });
@@ -69,11 +70,41 @@ app.post('/add',(req,res)=>{
     
     db.query(insertarRegistro,[name,email],(err)=>{
        if(err){
-        console.error('Erro al agregar usuario:',err);
-        res.send('Error')
+        console.error('Error al agregar usuario:',err);
+        res.send('Error');
     } else{
         res.redirect('/');
 
        }
+    });
+});
+
+//editar usuario
+app.get('/edit/:id',(req,res)=>{
+    const {id}= req.params;
+   const buscarUsuarioID = 'SELECT * FROM users WHERE id = ?';
+   
+   db.query(buscarUsuarioID,[id],(err,results)=>{
+        if(err){
+            console.error('Error en la DB',err);
+        }else{
+            res.render('edit',{ user: results[0]});
+        }
+   });
+});
+
+//update
+
+app.post('/update/:id',(req,res)=>{
+    const {id} = req.params;
+    const {name,email}= req.body;
+
+    const query= "UPDATE users SET name = ?, email = ?  WHERE id =?";
+    db.query(query,[name,email,id],(err)=>{
+            if(err){
+                console.error('error',err);
+            }else{
+                res.redirect('/');
+            }
     });
 });
